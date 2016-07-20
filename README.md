@@ -1,23 +1,28 @@
 # Pokemon Go Maps
 
-* USE AT YOUR OWN RISK !
-* includes protobuf file
-* maybe you should change some of the proto values like gps cords...
-* ugly code
-
-
 ## Instructions
+Generate a Google Maps API key here: https://console.developers.google.com/apis/credentials
+
+**MAC/LINUX:**
 
 * `pip install -r requirements.txt`
 * Put Google Maps API key in `config.json`
 * Syntax: `./run.sh [user] [pass] "[location]"`
-* Open another terminal in the project location and run `python -m SimpleHTTPServer 8000`
-* Run your browser to "http://localhost:8000"
+* Open browser to `http://localhost:8000`
 
+**WINDOWS GUIDE:**
 
-## Credits
-Thanks a lot to [Mila432](https://github.com/Mila432/Pokemon_Go_API), [Tejado](https://github.com/tejado/pokemongo-api-demo) for base API
-Thanks to [Leegao](https://github.com/leegao/pokemongo-api-demo/tree/simulation) for Pokemon-scanning,
-Thanks to [memelyfe](https://github.com/memelyfe/pokemongo-api-demo/tree/maps) for PokeMap
+* `pip install -r requirements.txt`
+* Put Google Maps API key in `config.json`
+* Start `run.bat` and enter in prompts for username, password, and location
+* Open browser to `http://localhost:8000`
 
-Thanks to all [/r/pokemongodev](https://www.reddit.com/r/pokemongodev/) subreddit
+Additional windows help here: https://www.reddit.com/r/pokemongodev/comments/4t8ohw/autoupdating_pokemon_go_map_scanner/d5g7xh80
+
+## Thanks
+
+Pokemon finding: https://github.com/leegao/pokemongo-api-demo
+
+Scanning algorithm: https://github.com/AHAAAAAAA/PokemonGo-Map
+
+Others: https://github.com/tejado/pokemongo-api-demo, https://github.com/Mila432/Pokemon_Go_API,

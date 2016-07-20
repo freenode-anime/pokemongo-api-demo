@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Drawing tools</title>
+    <title>PokeScanner</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
@@ -64,6 +64,33 @@
         z = z || '0';
         n = n + '';
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+      }
+
+      function formatSeconds(s) {
+        var timeleft_strify = s;
+        var timeleft_str = '';
+        if (timeleft_strify > 86400) {
+          timeleft_str += Math.floor(timeleft_strify / 86400) + " days, ";
+          timeleft_strify %= 86400;
+        }
+        if (timeleft_strify > 3600) {
+          timeleft_str += Math.floor(timeleft_strify / 3600) + "h";
+          timeleft_strify %= 3600;
+        }
+        if (timeleft_strify > 60) {
+          timeleft_str += Math.floor(timeleft_strify / 60) + "m";
+          timeleft_strify %= 60;
+        }
+        timeleft_str += Math.floor(timeleft_strify) + "s";
+        return timeleft_str;
+      }
+
+      function getImage(p) {
+        var image = "https://raw.githubusercontent.com/AHAAAAAAA/PokemonGo-Map/master/static/icons/" + p.id + ".png";
+        if (p.id == -1) {
+          image = 'https://agents.farmers.com/images/walking.png';
+        }
+        return image;
       }
 
       function toggleLayer(checked, pkmn) {
@@ -145,23 +172,8 @@
                 // Pokemon not hidden
 
                 p.timeleft = p.expiry - p.timestamp;
-                timeleft_strify = p.timeleft
-                p.timeleft_str = ''
-                if (timeleft_strify > 86400) {
-                    p.timeleft_str += Math.floor(timeleft_strify / 86400) + " days, ";
-                    timeleft_strify %= 86400;
-                }
-                if (timeleft_strify > 3600) {
-                    p.timeleft_str += Math.floor(timeleft_strify / 3600) + "h";
-                    timeleft_strify %= 3600;
-                }
-                if (timeleft_strify > 60) {
-                    p.timeleft_str += Math.floor(timeleft_strify / 60) + "m";
-                    timeleft_strify %= 60;
-                }
-                p.timeleft_str += Math.floor(timeleft_strify) + "s";
                 
-                detail_str = "<b>" + pkmn_label(p) + "</b><br>Time left: " + p.timeleft_str + "<br>Lat: " + p.lat + "<br>Long: " + p.lng;
+                detail_str = "<b>" + pkmn_label(p) + "</b><br>Time left: " + formatSeconds(p.timeleft) + "<br>Lat: " + p.lat + "<br>Long: " + p.lng;
 
                 if (markers.hasOwnProperty(pokehash)) {
                   markers[pokehash].details = detail_str;
@@ -173,10 +185,7 @@
                 var infowindow = new google.maps.InfoWindow({
                 });
 
-                var image = "https://raw.githubusercontent.com/AHAAAAAAA/PokemonGo-Map/master/static/icons/" + p.id + ".png";
-                if (p.id == -1) {
-                    image = 'https://agents.farmers.com/images/walking.png';
-                }
+                var image = getImage(p);
 
                 var marker = new google.maps.Marker({
                   map: map,
@@ -244,7 +253,6 @@
 
       function initMap() {
         console.log("Initializing map");
-        setInterval(refreshData, 1000);
 
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 0, lng: 0},
@@ -259,6 +267,8 @@
         legend.innerHTML = content.join('');
         legend.index = 1;
         map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+
+        setInterval(refreshData, 1000);
       }
     </script>
   </body>
