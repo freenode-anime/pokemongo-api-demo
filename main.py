@@ -56,6 +56,10 @@ NUM_STEPS = 5
 DATA_FILE = 'data.json'
 DATA = {}
 
+locations = []
+current_location_index = 0
+steplimit = NUM_STEPS
+
 def f2i(float):
   return struct.unpack('<Q', struct.pack('<d', float))[0]
 
@@ -107,16 +111,28 @@ def add_pokemon(pokeId, name, lat, lng, timestamp, timeleft):
             'expiry': expiry
         }
 
-def set_location(location_name):
-    geolocator = GoogleV3()
-    loc = geolocator.geocode(location_name)
+geolocator = GoogleV3()
+def parse_location(s):
+    m = re.match('^(\d+)\:', s)
+    steps = NUM_STEPS
+    if m:
+        steps = int(m.group(1))
+        s = s[m.end():]
 
+    loc = geolocator.geocode(s)
+    return (steps, loc)
+
+def set_location(location_info):
+    loc = location_info[1]
     print('[!] Your given location: {}'.format(loc.address.encode('utf-8')))
     print('[!] lat/long/alt: {} {} {}'.format(loc.latitude, loc.longitude, loc.altitude))
 
     global deflat
     global deflng
     deflat, deflng = loc.latitude, loc.longitude
+
+    global steplimit
+    steplimit = location_info[0]
 
     set_location_coords(loc.latitude, loc.longitude, loc.altitude)
 
@@ -306,8 +322,8 @@ def heartbeat(api_endpoint, access_token, response):
 
 
 def scan(api_endpoint, access_token, response, origin, pokemons):
+    global steplimit
     steps = 0
-    steplimit = NUM_STEPS
     pos = 1
     x   = 0
     y   = 0
@@ -374,7 +390,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-u", "--username", help="PTC Username", required=True)
     parser.add_argument("-p", "--password", help="PTC Password", required=True)
-    parser.add_argument("-l", "--location", help="Location", required=True)
+    parser.add_argument("-l", "--location", help="Location", required=True, action='append')
     parser.add_argument("-d", "--debug", help="Debug Mode", action='store_true')
     parser.set_defaults(DEBUG=False)
     args = parser.parse_args()
@@ -384,7 +400,8 @@ def main():
         DEBUG = True
         print('[!] DEBUG mode on')
 
-    set_location(args.location)
+    for loc in args.location:
+        locations.append(parse_location(loc))
 
     access_token = login_ptc(args.username, args.password)
     if access_token is None:
@@ -424,8 +441,11 @@ def main():
 
     origin = LatLng.from_degrees(FLOAT_LAT, FLOAT_LONG)
 
+    global current_location_index
     while True:
+        set_location(locations[current_location_index])
         scan(api_endpoint, access_token, response, origin, pokemons)
+        current_location_index = (current_location_index + 1) % len(locations)
 
 
 if __name__ == '__main__':
